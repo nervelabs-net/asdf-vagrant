@@ -14,13 +14,16 @@ install_vagrant() {
 
   echo "Creating bin directory"
   mkdir -p "${bin_install_path}"
+  echo "Creating repo (${repo_path}) directory"
+  mkdir -p "${repo_path}"
 
   echo "Installing vagrant from ${download_url} to ${binary_path}"
   echo "Cloning repository..."
   git clone --quiet --single-branch --branch v${version} --depth 1 ${download_url} ${repo_path} >/dev/null 2>&1
   cd ${repo_path}
+  #sed -i.bak "s/.*git:.*/  gem 'vagrant-spec', git: \"https:\/\/github.com\/hashicorp\/vagrant-spec.git\", branch: 'main'/g" Gemfile
   echo "Building executable"
-  bundle --binstubs exec --no-verbose --path build >/dev/null 2>&1
+  bundle install --binstubs "exec" --path "build" --verbose >/dev/null 2>&1
   ln -sf ${repo_path}/exec/vagrant ${binary_path}
 
 }

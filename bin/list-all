@@ -2,8 +2,11 @@
 
 set -euo pipefail
 
+min_version='2.2.17'
+min_version_int=$(echo $min_version | sed 's/\.//g')
+
 list_all_versions() {
-  curl -sL --http1.1 https://releases.hashicorp.com/vagrant/ | sed -n "s/.*\(vagrant_[0-9.]*\).*/\1/p" | awk -F"_" '{ print $2 }'
+  for version in `curl -sL --http1.1 https://releases.hashicorp.com/vagrant/ | sed -n "s/.*\(vagrant_[0-9.]*\).*/\1/p" | awk -F"_" '{ print $2 }'`;do version_int=$(echo $version | sed 's/\.//g') && if [[ "$version_int" -ge "$min_version_int" ]];then echo $version;fi;done
 }
 
 list_all_versions | uniq | sort -V | tr '\n' ' '
