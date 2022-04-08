@@ -7,55 +7,18 @@ set -euo pipefail
 install_vagrant() {
   local version=$1
   local install_path=$2
-  local extension
   local bin_install_path="$install_path/bin"
   local binary_path="$bin_install_path/vagrant"
-  local download_url
+  local repo_path="$install_path/repo"
+  local download_url="https://github.com/hashicorp/vagrant.git"
 
-  extension="$(getExtension)"
-  download_url="$(get_download_url "${version}" "${extension}")"
   echo "Creating bin directory"
   mkdir -p "${bin_install_path}"
 
-  echo "Downloading vagrant from ${download_url} to ${binary_path}"
-  curl -fL "${download_url}" -o "${binary_path}"
-  chmod +x "${binary_path}"
-}
+  echo "Installing vagrant from ${download_url} to ${binary_path}"
+  git clone --single-branch --branch v${version} --depth 1 ${download_url} ${repo_path}
+  bundle install --path ${bin_install_path}
 
-getExtension() {
-  # This part is not ready yet
-  local EXT
-  EXT="$(uname | tr '[:upper:]' '[:lower:]')"
-  case $EXT in
-    darwin) EXT="dmg";;
-    linux) EXT="deb";;
-  esac
-  echo "$EXT"
-}
-
-getArch() {
-  # This part is not ready yet
-  ARCH=$(uname -m)
-  case $ARCH in
-    aarch64) ARCH="arm64";;
-    x86_64) ARCH="x86_64";;
-  esac
-  echo "$ARCH"
-}
-
-get_filename() {
-  local version="$1"
-  local arch="$(getArch)"
-  local extension="$2"
-  echo "vagrant_${version}_${arch}.${extension}"
-}
-
-get_download_url() {
-  local version="$1"
-  local extension="$2"
-  local filename
-  filename="$(get_filename "${version}" "${extension}")"
-  echo "https://releases.hashicorp.com/vagrant/${version}/${filename}"
 }
 
 install_vagrant "${ASDF_INSTALL_VERSION}" "${ASDF_INSTALL_PATH}"
