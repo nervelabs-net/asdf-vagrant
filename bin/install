@@ -16,8 +16,12 @@ install_vagrant() {
   mkdir -p "${bin_install_path}"
 
   echo "Installing vagrant from ${download_url} to ${binary_path}"
-  git clone --single-branch --branch v${version} --depth 1 ${download_url} ${repo_path}
-  bundle install --path ${bin_install_path}
+  echo "Cloning repository..."
+  git clone --quiet --single-branch --branch v${version} --depth 1 ${download_url} ${repo_path} >/dev/null 2>&1
+  cd ${repo_path}
+  echo "Building executable"
+  bundle --binstubs exec --no-verbose --path build >/dev/null 2>&1
+  ln -sf ${repo_path}/exec/vagrant ${binary_path}
 
 }
 
