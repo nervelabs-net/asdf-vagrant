@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+list_all_versions() {
+  curl -sL --http1.1 https://releases.hashicorp.com/vagrant/ | sed -n "s/.*\(vagrant_[0-9.]*\).*/\1/p" | awk -F"_" '{ print $2 }'
+}
+
+list_all_versions | uniq | sort -V | tr '\n' ' '
